@@ -1,0 +1,17 @@
+{
+    "name": "revit-smp/application",
+    "description": "Sistem Informasi Bantuan Revitalisasi Sekolah",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.1",
+        "codeigniter4/framework": "^4.6",
+        "kint-php/kint": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Config\\": "app/Config/"
+        }
+    }
+}
