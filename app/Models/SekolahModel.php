@@ -12,7 +12,7 @@ class SekolahModel extends Model
     protected $returnType       = 'array';
     protected $allowedFields    = [
         'nama_sekolah', 'npsn', 'provinsi', 'kab_kota',
-        'dana_diterima', 'total_minggu', 'pengawas_id'
+        'dana_diterima', 'total_minggu', 'pengawas_id', 'perencana_id'
     ];
     protected $useTimestamps = true;
 
@@ -21,11 +21,10 @@ class SekolahModel extends Model
         return $this->where('pengawas_id', $pengawasId)->findAll();
     }
 
-    public function getByPerencana(string $namaPerencana): array
+    public function getByPerencana(int $perencanaId): array
     {
-        return $this->select('sekolah.*')
-                    ->join('personil_sekolah', 'personil_sekolah.sekolah_id = sekolah.id')
-                    ->where('personil_sekolah.perencana', $namaPerencana)
+        return $this->where('perencana_id', $perencanaId)
+                    ->orderBy('nama_sekolah', 'ASC')
                     ->findAll();
     }
 

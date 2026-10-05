@@ -7,13 +7,24 @@ namespace Composer\Autoload;
 class ComposerStaticInitc263c2ce506da023e7e30d64f37eaead
 {
     public static $files = array (
+        '0174385c3be07e86008907d06ee66531' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Rule/Rule.php',
+        '98aea6e41b9cb79b379b10f37ba1f0b7' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/RuleSet/RuleContainer.php',
         '3917c79c5052b270641b5a200963dbc2' => __DIR__ . '/..' . '/kint-php/kint/init.php',
     );
 
     public static $prefixLengthsPsr4 = array (
+        'S' =>
+        array (
+            'Svg\\' => 4,
+            'Sabberworm\\CSS\\' => 15,
+        ),
         'P' =>
         array (
             'Psr\\Log\\' => 8,
+        ),
+        'M' =>
+        array (
+            'Masterminds\\' => 12,
         ),
         'L' =>
         array (
@@ -22,6 +33,14 @@ class ComposerStaticInitc263c2ce506da023e7e30d64f37eaead
         'K' =>
         array (
             'Kint\\' => 5,
+        ),
+        'F' =>
+        array (
+            'FontLib\\' => 8,
+        ),
+        'D' =>
+        array (
+            'Dompdf\\' => 7,
         ),
         'C' =>
         array (
@@ -35,9 +54,21 @@ class ComposerStaticInitc263c2ce506da023e7e30d64f37eaead
     );
 
     public static $prefixDirsPsr4 = array (
+        'Svg\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
+        ),
+        'Sabberworm\\CSS\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
+        ),
         'Psr\\Log\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
+        ),
+        'Masterminds\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),
         'Laminas\\Escaper\\' =>
         array (
@@ -46,6 +77,14 @@ class ComposerStaticInitc263c2ce506da023e7e30d64f37eaead
         'Kint\\' =>
         array (
             0 => __DIR__ . '/..' . '/kint-php/kint/src',
+        ),
+        'FontLib\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib',
+        ),
+        'Dompdf\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/dompdf/dompdf/src',
         ),
         'Config\\' =>
         array (
@@ -63,6 +102,7 @@ class ComposerStaticInitc263c2ce506da023e7e30d64f37eaead
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'Dompdf\\Cpdf' => __DIR__ . '/..' . '/dompdf/dompdf/lib/Cpdf.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

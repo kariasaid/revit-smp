@@ -27,7 +27,7 @@ class TimP2SP extends BaseController
 
         $schools = $role === 'admin'
             ? (new SekolahModel())->orderBy('nama_sekolah', 'ASC')->findAll()
-            : (new SekolahModel())->getByPerencana((string) session()->get('nama_lengkap'));
+            : (new SekolahModel())->getByPerencana((int) session()->get('id'));
         if ($schools === []) {
             return redirect()->to('/dashboard')->with('error', 'Belum ada sekolah yang ditugaskan kepada akun ini.');
         }
@@ -98,7 +98,7 @@ class TimP2SP extends BaseController
         $schoolId = (int) $this->request->getPost('sekolah_id');
         $schools = $role === 'admin'
             ? (new SekolahModel())->findAll()
-            : (new SekolahModel())->getByPerencana((string) session()->get('nama_lengkap'));
+            : (new SekolahModel())->getByPerencana((int) session()->get('id'));
         $school = null;
         foreach ($schools as $assignedSchool) {
             if ((int) $assignedSchool['id'] === $schoolId) {

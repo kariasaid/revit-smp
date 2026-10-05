@@ -4,8 +4,24 @@
 <div class="mb-4">
     <div class="small text-muted mb-1">Perencanaan / Monitoring</div>
     <h1 class="h4 fw-bold mb-1">Monitoring Progres Sekolah</h1>
-    <div class="text-muted">Pantau jadwal dan status laporan mingguan yang diperiksa admin.</div>
+    <div class="text-muted">Pilih sekolah untuk melihat jadwal, kurva S, progres, serapan dana, dan status laporan sekolah tersebut.</div>
 </div>
+
+<?php if (!empty($allSchools)): ?>
+    <div class="card mb-4">
+        <div class="card-body">
+            <label for="monitoringSekolah" class="form-label fw-semibold">Sekolah</label>
+            <select id="monitoringSekolah" class="form-select" onchange="if(this.value){window.location.href='<?= base_url('perencana/monitoring-progres') ?>?sekolah_id='+encodeURIComponent(this.value)}">
+                <?php foreach ($allSchools as $schoolOption): ?>
+                    <option value="<?= (int) $schoolOption['id'] ?>" <?= (int) $selectedSchoolId === (int) $schoolOption['id'] ? 'selected' : '' ?>>
+                        <?= esc($schoolOption['nama_sekolah']) ?> — NPSN <?= esc($schoolOption['npsn']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <div class="small text-muted mt-2">Data di bawah otomatis mengikuti sekolah yang dipilih.</div>
+        </div>
+    </div>
+<?php endif; ?>
 
 <?php if (empty($schools)): ?>
     <div class="card"><div class="card-body text-center text-muted py-5">Belum ada sekolah yang ditugaskan kepada Anda.</div></div>

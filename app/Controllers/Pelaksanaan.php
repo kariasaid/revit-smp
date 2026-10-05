@@ -95,7 +95,7 @@ class Pelaksanaan extends BaseController
         if ($role === 'perencana') {
             $assignedSchoolIds = array_map(
                 static fn (array $assignedSchool): int => (int) $assignedSchool['id'],
-                $sekolahModel->getByPerencana((string) session()->get('nama_lengkap'))
+                $sekolahModel->getByPerencana((int) session()->get('id'))
             );
             if (!in_array((int) $sekolah['id'], $assignedSchoolIds, true)) {
                 return redirect()->to('/dashboard')->with('error', 'Laporan bukan berasal dari sekolah penugasan Anda.');
@@ -153,7 +153,7 @@ class Pelaksanaan extends BaseController
         if ($role === 'perencana') {
             $assignedSchoolIds = array_map(
                 static fn (array $assignedSchool): int => (int) $assignedSchool['id'],
-                $sekolahModel->getByPerencana((string) session()->get('nama_lengkap'))
+                $sekolahModel->getByPerencana((int) session()->get('id'))
             );
             if (!in_array((int) $sekolah['id'], $assignedSchoolIds, true)) {
                 return redirect()->to('/dashboard')->with('error', 'Laporan bukan berasal dari sekolah penugasan Anda.');
@@ -186,10 +186,8 @@ class Pelaksanaan extends BaseController
         $userModel = new UserModel();
         $pengawasUser = $userModel->find((int) ($sekolah['pengawas_id'] ?? 0));
         $perencanaUser = null;
-        if (!empty($personil['perencana'])) {
-            $perencanaUser = $userModel->where('role', 'perencana')
-                ->where('nama_lengkap', $personil['perencana'])
-                ->first();
+        if (!empty($sekolah['perencana_id'])) {
+            $perencanaUser = $userModel->where('role', 'perencana')->find((int) $sekolah['perencana_id']);
         }
         foreach ([
             'ketua' => 'kepala_sekolah',

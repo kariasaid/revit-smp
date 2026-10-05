@@ -6,7 +6,8 @@
     "require": {
         "php": "^8.1",
         "codeigniter4/framework": "^4.6",
-        "kint-php/kint": "^5.0"
+        "kint-php/kint": "^5.0",
+        "dompdf/dompdf": "^3.1"
     },
     "autoload": {
         "psr-4": {

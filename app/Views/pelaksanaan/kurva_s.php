@@ -86,7 +86,8 @@
 
 <?= $this->section('content') ?>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+<div class="d-flex flex-wrap gap-3 mb-4">
+    <i class="bi bi-graph-up-arrow"></i>
     <h5 class="mb-0 fw-bold">Kurva S Pelaksanaan</h5>
 </div>
 

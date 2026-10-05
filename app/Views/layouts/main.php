@@ -19,46 +19,59 @@
         * { font-family: 'Inter', sans-serif; }
         body { background: var(--bg-body); margin: 0; min-height: 100vh; }
 
-        /* Sidebar */
+        /* Sidebar – dark blue SaaS style */
         .sidebar {
             width: var(--sidebar-width);
-            background: #fff;
-            border-right: 1px solid #e5e7eb;
+            background: linear-gradient(180deg, #0a2540 0%, #0d2f52 100%);
+            border-right: none;
             position: fixed;
             top: 0; left: 0; bottom: 0;
             z-index: 1000;
             overflow-y: auto;
             transition: transform .3s;
+            display: flex;
+            flex-direction: column;
         }
         .sidebar-brand {
-            padding: 1.25rem 1.5rem;
+            padding: 1.35rem 1.5rem;
             display: flex;
             align-items: center;
             gap: .75rem;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid rgba(255,255,255,.08);
         }
         .sidebar-brand img { height: 32px; }
-        .sidebar-brand span { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
-        .nav-sidebar { padding: 1rem .75rem; }
+        .sidebar-brand span { font-weight: 700; color: #fff; font-size: 1.05rem; letter-spacing: .01em; }
+        .sidebar-brand .brand-sub { font-size: .68rem; color: rgba(255,255,255,.55); font-weight: 400; margin-top: 1px; }
+        .nav-sidebar { padding: 1rem .75rem; flex: 1; }
         .nav-sidebar .nav-link {
-            color: #4b5563;
-            border-radius: .5rem;
+            color: rgba(255,255,255,.7);
+            border-radius: .55rem;
             padding: .65rem 1rem;
-            margin-bottom: .25rem;
-            font-size: .9rem;
+            margin-bottom: .2rem;
+            font-size: .88rem;
             font-weight: 500;
             display: flex;
             align-items: center;
             gap: .75rem;
         }
-        .nav-sidebar .nav-link:hover { background: var(--primary-light); color: var(--primary); }
+        .nav-sidebar .nav-link:hover { background: rgba(255,255,255,.08); color: #fff; }
         .nav-sidebar .nav-link.active {
-            background: var(--primary);
+            background: #1d6fd8;
             color: #fff;
+            box-shadow: 0 4px 12px rgba(29,111,216,.35);
         }
-        .nav-sidebar .nav-link i { font-size: 1.15rem; width: 22px; text-align: center; }
-        .nav-sidebar .submenu { padding-left: 2.5rem; }
-        .nav-sidebar .submenu .nav-link { font-size: .85rem; padding: .45rem 1rem; }
+        .nav-sidebar .nav-link i { font-size: 1.1rem; width: 22px; text-align: center; }
+        .nav-sidebar .submenu { padding-left: 2.25rem; }
+        .nav-sidebar .submenu .nav-link { font-size: .82rem; padding: .4rem 1rem; color: rgba(255,255,255,.55); }
+        .nav-sidebar .submenu .nav-link:hover,
+        .nav-sidebar .submenu .nav-link.active { color: #fff; background: rgba(255,255,255,.08); }
+        .sidebar-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid rgba(255,255,255,.08);
+            color: rgba(255,255,255,.45);
+            font-size: .72rem;
+        }
+        .sidebar-footer .sf-brand { color: rgba(255,255,255,.75); font-weight: 600; font-size: .8rem; }
 
         /* Main content */
         .main-wrapper { margin-left: var(--sidebar-width); min-height: 100vh; min-width: 0; display: flex; flex-direction: column; }
@@ -71,7 +84,8 @@
             justify-content: space-between;
         }
         .topbar-title { font-weight: 600; color: #1f2937; font-size: 1.05rem; }
-        .content-area { padding: 1.5rem 1.75rem; flex: 1; min-width: 0; }
+        .content-area { padding: 1.5rem 1.75rem; flex: 1; min-width: 0; background: #f0f4f8; }
+        .nav-sidebar .nav-link .bi-chevron-down { color: rgba(255,255,255,.4); }
 
         /* Cards */
         .card { border: none; border-radius: .75rem; box-shadow: var(--card-shadow); }
@@ -176,10 +190,13 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <div style="width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;">
-                <i class="bi bi-building text-white"></i>
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#1d6fd8,#3b9cff);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(29,111,216,.4);">
+                <i class="bi bi-building text-white" style="font-size:1.1rem"></i>
             </div>
-            <span>TAKSU DEWATA</span>
+            <div>
+                <span>TAKSU DEWATA</span>
+                <div class="brand-sub">Revitalisasi Sekolah</div>
+            </div>
         </div>
         <nav class="nav-sidebar">
             <?php if (session()->get('role') !== 'admin'): ?>
@@ -283,6 +300,18 @@
                 <i class="bi bi-person"></i> Profil Pengguna
             </a>
         </nav>
+        <div class="sidebar-footer">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <div style="width:28px;height:28px;background:rgba(255,255,255,.1);border-radius:7px;display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-building" style="font-size:.85rem;color:rgba(255,255,255,.7)"></i>
+                </div>
+                <div>
+                    <div class="sf-brand">REVIT SMP</div>
+                    <div>Sistem Informasi Bantuan<br>Revitalisasi Sekolah</div>
+                </div>
+            </div>
+            <div class="mt-2 opacity-75">v1.0.0</div>
+        </div>
     </aside>
     <button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="Tutup menu"></button>
 
@@ -291,14 +320,34 @@
         <header class="topbar">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn btn-sm btn-light d-lg-none" id="sidebarToggle"><i class="bi bi-list"></i></button>
-                <span class="topbar-title"><?= esc(ucfirst((string) (session()->get('role') ?? 'Pengguna'))) ?></span>
+                <span class="topbar-title">
+                    <?php
+                    $roleLabel = match (session()->get('role')) {
+                        'pengawas'  => 'Dashboard Pengawas',
+                        'admin'     => 'Dashboard Admin',
+                        'perencana' => 'Dashboard Perencana',
+                        default     => esc($title ?? 'Dashboard'),
+                    };
+                    echo $roleLabel;
+                    ?>
+                </span>
             </div>
             <div class="d-flex align-items-center gap-3">
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center gap-2 text-decoration-none text-dark" data-bs-toggle="dropdown">
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:36px;height:36px;font-size:.85rem;">
-                            <?= strtoupper(substr(session()->get('nama_lengkap') ?? 'U', 0, 1)) ?>
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-semibold" style="width:36px;height:36px;font-size:.8rem;">
+                            <?php
+                            $nama = session()->get('nama_lengkap') ?? 'User';
+                            $parts = preg_split('/\s+/', trim($nama));
+                            $initials = strtoupper(substr($parts[0] ?? 'U', 0, 1) . substr($parts[1] ?? ($parts[0] ?? 'U'), 0, 1));
+                            echo esc($initials);
+                            ?>
                         </div>
+                        <div class="d-none d-md-block text-start lh-sm">
+                            <div class="fw-semibold" style="font-size:.85rem"><?= esc(session()->get('nama_lengkap') ?? 'Pengguna') ?></div>
+                            <div class="text-muted" style="font-size:.72rem"><?= esc(ucfirst((string) (session()->get('role') ?? ''))) ?></div>
+                        </div>
+                        <i class="bi bi-chevron-down text-muted small d-none d-md-inline"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="<?= base_url('profil') ?>"><i class="bi bi-person me-2"></i>Profil</a></li>

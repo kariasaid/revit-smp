@@ -14,7 +14,14 @@ class MonitoringPerencana extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Halaman monitoring hanya dapat diakses perencana.');
         }
 
-        $schools = (new SekolahModel())->getByPerencana((string) session()->get('nama_lengkap'));
+        $allSchools = (new SekolahModel())->getByPerencana((int) session()->get('id'));
+        $selectedSchoolId = (int) ($this->request->getGet('sekolah_id') ?? 0);
+        if ($selectedSchoolId > 0) {
+            $schools = array_values(array_filter($allSchools, static fn($school) => (int) $school['id'] === $selectedSchoolId));
+        } else {
+            $schools = array_slice($allSchools, 0, 1);
+            $selectedSchoolId = !empty($schools) ? (int) $schools[0]['id'] : 0;
+        }
         $scheduleModel = new RencanaMingguanModel();
         $progressModel = new ProgresMingguanModel();
         $curveCharts = [];
@@ -85,6 +92,8 @@ class MonitoringPerencana extends BaseController
             'title'      => 'Monitoring Progres Sekolah',
             'activeMenu' => 'monitoring-progres',
             'schools'    => $schools,
+            'allSchools' => $allSchools,
+            'selectedSchoolId' => $selectedSchoolId,
             'curveCharts'=> $curveCharts,
         ]);
     }

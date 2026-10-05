@@ -46,12 +46,15 @@ CREATE TABLE IF NOT EXISTS `sekolah` (
   `dana_diterima` DECIMAL(15,2) DEFAULT 0.00,
   `total_minggu` TINYINT UNSIGNED DEFAULT 16,
   `pengawas_id` INT UNSIGNED DEFAULT NULL,
+  `perencana_id` INT UNSIGNED DEFAULT NULL,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_npsn` (`npsn`),
   KEY `fk_sekolah_pengawas` (`pengawas_id`),
-  CONSTRAINT `fk_sekolah_pengawas` FOREIGN KEY (`pengawas_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  KEY `fk_sekolah_perencana` (`perencana_id`),
+  CONSTRAINT `fk_sekolah_pengawas` FOREIGN KEY (`pengawas_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_sekolah_perencana` FOREIGN KEY (`perencana_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
@@ -316,8 +319,8 @@ INSERT INTO `users` (`username`, `email`, `password`, `nama_lengkap`, `nik`, `ni
 -- Akun perencana: username perencana, password RencanaSMP#2026
 
 -- Sekolah
-INSERT INTO `sekolah` (`nama_sekolah`, `npsn`, `provinsi`, `kab_kota`, `dana_diterima`, `total_minggu`, `pengawas_id`) VALUES
-('SMP NEGERI 1 SERIRIT', '50100321', 'Prov. Bali', 'Kab. Buleleng', 786779000.00, 16, 1);
+INSERT INTO `sekolah` (`nama_sekolah`, `npsn`, `provinsi`, `kab_kota`, `dana_diterima`, `total_minggu`, `pengawas_id`, `perencana_id`) VALUES
+('SMP NEGERI 1 SERIRIT', '50100321', 'Prov. Bali', 'Kab. Buleleng', 786779000.00, 16, 1, (SELECT `id` FROM `users` WHERE `role`='perencana' ORDER BY `id` LIMIT 1));
 
 -- Personil Sekolah
 INSERT INTO `personil_sekolah` (`sekolah_id`, `kepala_sekolah`, `hp_kepala_sekolah`, `perencana`, `hp_perencana`, `pengawas`, `hp_pengawas`, `reviewer`, `hp_reviewer`, `fasilitator`, `hp_fasilitator`, `ta_pusat`, `hp_ta_pusat`) VALUES

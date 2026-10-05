@@ -15,10 +15,17 @@ $akumFisik = (float)($summary['akumulasi_fisik'] ?? 0);
     </div>
     <div class="card-body">
         <div class="mb-3">
-            <label class="form-label small text-muted">Sekolah</label>
-            <select class="form-select" disabled>
-                <option><?= esc($sekolah['nama_sekolah'] ?? '-') ?></option>
-            </select>
+            <label for="sekolahPelaporan" class="form-label small text-muted">Sekolah</label>
+            <form method="get" action="<?= base_url('pelaporan/' . ($is100 ? '100' : '50')) ?>" id="formPilihSekolah">
+                <select name="sekolah_id" id="sekolahPelaporan" class="form-select" onchange="this.form.submit()" aria-label="Pilih sekolah">
+                    <?php foreach (($sekolahList ?? []) as $item): ?>
+                        <option value="<?= (int) $item['id'] ?>" <?= ((int)($selectedSchoolId ?? 0) === (int)$item['id']) ? 'selected' : '' ?>>
+                            <?= esc($item['nama_sekolah']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </form>
+            <div class="small text-muted mt-1">Data pelaporan, serapan dana, dan progres di bawah otomatis mengikuti sekolah yang dipilih.</div>
         </div>
 
         <!-- Summary Metrics -->

@@ -16,6 +16,34 @@
     <div class="col-md-4"><div class="card h-100"><div class="card-body"><div class="small text-muted">Pengawas</div><div class="fw-semibold"><?= esc($school['pengawas'] ?? '-') ?></div></div></div></div>
 </div>
 
+<div class="card mb-4">
+    <div class="card-header"><strong>Penugasan Perencana &amp; Pengawas</strong></div>
+    <div class="card-body">
+        <form method="post" action="<?= base_url('admin/sekolah/' . (int) $school['id'] . '/penugasan') ?>">
+            <?= csrf_field() ?>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="perencana_id">Perencana</label>
+                    <select class="form-select" id="perencana_id" name="perencana_id" required>
+                        <?php foreach ($perencana as $item): ?>
+                            <option value="<?= (int) $item['id'] ?>" <?= (int)($school['perencana_id'] ?? 0) === (int)$item['id'] ? 'selected' : '' ?>><?= esc($item['nama_lengkap']) ?><?php if (!empty($item['nip'])): ?> - NIP <?= esc($item['nip']) ?><?php endif; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="pengawas_id">Pengawas</label>
+                    <select class="form-select" id="pengawas_id" name="pengawas_id" required>
+                        <?php foreach ($pengawas as $item): ?>
+                            <option value="<?= (int) $item['id'] ?>" <?= (int)($school['pengawas_id'] ?? 0) === (int)$item['id'] ? 'selected' : '' ?>><?= esc($item['nama_lengkap']) ?><?php if (!empty($item['nip'])): ?> - NIP <?= esc($item['nip']) ?><?php endif; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary mt-3" type="submit"><i class="bi bi-check2-circle me-1"></i>Simpan Penugasan</button>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
         <div><strong><i class="bi bi-images text-primary me-2"></i>Jenis bantuan, volume, dan foto awal bangunan</strong><div class="small text-muted">Volume ditampilkan di dokumentasi progres mingguan. Foto awal disimpan sebagai kondisi 0%.</div></div>

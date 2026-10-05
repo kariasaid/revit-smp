@@ -19,9 +19,14 @@ $routes->group('', ['filter' => 'auth'], static function (RouteCollection $route
 	$routes->post('admin/keuangan/(:segment)/(:num)/update', 'AdminKeuangan::update/$1/$2');
 	$routes->post('admin/keuangan/(:segment)/(:num)/hapus', 'AdminKeuangan::delete/$1/$2');
 	$routes->post('admin/keuangan/(:segment)/upload', 'AdminKeuangan::uploadDocument/$1');
+	$routes->get('admin/users', 'AdminUsers::index');
+	$routes->post('admin/users/simpan', 'AdminUsers::store');
+	$routes->post('admin/users/(:num)/update', 'AdminUsers::update/$1');
+	$routes->post('admin/users/(:num)/hapus', 'AdminUsers::delete/$1');
 	$routes->get('admin/sekolah', 'AdminSekolah::index');
 	$routes->get('admin/sekolah/(:num)', 'AdminSekolah::detail/$1');
 	$routes->post('admin/sekolah/simpan', 'AdminSekolah::store');
+	$routes->post('admin/sekolah/(:num)/penugasan', 'AdminSekolah::updatePenugasan/$1');
 	$routes->post('admin/sekolah/(:num)/bantuan', 'AdminSekolah::storeBantuan/$1');
 	$routes->post('admin/bantuan/(:num)/update', 'AdminSekolah::updateBantuan/$1');
 	$routes->post('admin/bantuan/(:num)/hapus', 'AdminSekolah::deleteBantuan/$1');

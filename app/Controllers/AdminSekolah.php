@@ -15,7 +15,9 @@ class AdminSekolah extends BaseController
         }
 
         $schools = Database::connect()->table('sekolah')
-            ->select('sekolah.*, personil_sekolah.perencana, personil_sekolah.hp_perencana, personil_sekolah.pengawas, personil_sekolah.hp_pengawas')
+            ->select('sekolah.*, personil_sekolah.perencana, personil_sekolah.hp_perencana, personil_sekolah.pengawas, personil_sekolah.hp_pengawas, perencana.nama_lengkap AS nama_perencana_user, perencana.nik AS nik_perencana_user, perencana.nip AS nip_perencana_user, pengawas.nama_lengkap AS nama_pengawas_user, pengawas.nik AS nik_pengawas_user, pengawas.nip AS nip_pengawas_user')
+            ->join('users perencana', 'perencana.id = sekolah.perencana_id', 'left')
+            ->join('users pengawas', 'pengawas.id = sekolah.pengawas_id', 'left')
             ->join('personil_sekolah', 'personil_sekolah.sekolah_id = sekolah.id', 'left')
             ->orderBy('sekolah.nama_sekolah', 'ASC')
             ->get()
@@ -29,11 +31,16 @@ class AdminSekolah extends BaseController
             $assistanceBySchool[$assistance['sekolah_id']][] = $assistance['nama_bantuan'];
         }
 
+        $perencana = Database::connect()->table('users')->select('id, nama_lengkap, nik, nip, no_hp, email')->where('role', 'perencana')->orderBy('nama_lengkap', 'ASC')->get()->getResultArray();
+        $pengawas = Database::connect()->table('users')->select('id, nama_lengkap, nik, nip, no_hp, email')->where('role', 'pengawas')->orderBy('nama_lengkap', 'ASC')->get()->getResultArray();
+
         return view('admin/sekolah', [
             'title'      => 'Kelola Sekolah',
             'activeMenu' => 'admin-sekolah',
             'schools'    => $schools,
             'assistanceBySchool' => $assistanceBySchool,
+            'perencana'  => $perencana,
+            'pengawas'   => $pengawas,
         ]);
     }
 
@@ -87,7 +94,9 @@ class AdminSekolah extends BaseController
 
         $db = Database::connect();
         $school = $db->table('sekolah')
-            ->select('sekolah.*, personil_sekolah.perencana, personil_sekolah.pengawas, personil_sekolah.kepala_sekolah')
+            ->select('sekolah.*, personil_sekolah.perencana, personil_sekolah.pengawas, personil_sekolah.kepala_sekolah, perencana.nama_lengkap AS nama_perencana_user, perencana.nik AS nik_perencana_user, perencana.nip AS nip_perencana_user, pengawas.nama_lengkap AS nama_pengawas_user, pengawas.nik AS nik_pengawas_user, pengawas.nip AS nip_pengawas_user')
+            ->join('users perencana', 'perencana.id = sekolah.perencana_id', 'left')
+            ->join('users pengawas', 'pengawas.id = sekolah.pengawas_id', 'left')
             ->join('personil_sekolah', 'personil_sekolah.sekolah_id = sekolah.id', 'left')
             ->where('sekolah.id', $schoolId)
             ->get()
@@ -102,11 +111,16 @@ class AdminSekolah extends BaseController
             ->get()
             ->getResultArray();
 
+        $perencana = $db->table('users')->select('id, nama_lengkap, nik, nip, no_hp, email')->where('role', 'perencana')->orderBy('nama_lengkap', 'ASC')->get()->getResultArray();
+        $pengawas = $db->table('users')->select('id, nama_lengkap, nik, nip, no_hp, email')->where('role', 'pengawas')->orderBy('nama_lengkap', 'ASC')->get()->getResultArray();
+
         return view('admin/detail_sekolah', [
             'title'      => 'Detail Sekolah',
             'activeMenu' => 'admin-sekolah',
             'school'     => $school,
             'assistance' => $assistance,
+            'perencana'  => $perencana,
+            'pengawas'   => $pengawas,
         ]);
     }
 
@@ -251,116 +265,70 @@ class AdminSekolah extends BaseController
         if (session()->get('role') !== 'admin') {
             return redirect()->to('/dashboard')->with('error', 'Hanya admin yang dapat menambahkan sekolah.');
         }
-
         $rules = [
-            'nama_sekolah'       => 'required|max_length[200]',
-            'npsn'               => 'required|numeric|max_length[20]',
-            'provinsi'           => 'required|max_length[100]',
-            'kab_kota'           => 'required|max_length[100]',
-            'dana_diterima'      => 'required|decimal|greater_than_equal_to[0]',
-            'total_minggu'       => 'required|integer|greater_than[0]|less_than_equal_to[52]',
-            'nama_perencana'     => 'required|max_length[150]',
-            'nik_perencana'      => 'required|numeric|exact_length[16]',
-            'email_perencana'    => 'permit_empty|valid_email|max_length[150]',
-            'hp_perencana'       => 'permit_empty|max_length[20]',
-            'nama_pengawas'      => 'required|max_length[150]',
-            'nik_pengawas'       => 'required|numeric|exact_length[16]',
-            'email_pengawas'     => 'permit_empty|valid_email|max_length[150]',
-            'hp_pengawas'        => 'permit_empty|max_length[20]',
-            'kepala_sekolah'     => 'permit_empty|max_length[150]',
-            'hp_kepala_sekolah'  => 'permit_empty|max_length[20]',
+            'nama_sekolah' => 'required|max_length[200]', 'npsn' => 'required|numeric|max_length[20]',
+            'provinsi' => 'required|max_length[100]', 'kab_kota' => 'required|max_length[100]',
+            'dana_diterima' => 'required|decimal|greater_than_equal_to[0]',
+            'total_minggu' => 'required|integer|greater_than[0]|less_than_equal_to[52]',
+            'perencana_id' => 'required|integer', 'pengawas_id' => 'required|integer',
+            'kepala_sekolah' => 'permit_empty|max_length[150]', 'hp_kepala_sekolah' => 'permit_empty|max_length[20]',
         ];
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('error', implode(' ', $this->validator->getErrors()));
-        }
-
-        $plannerNik = (string) $this->request->getPost('nik_perencana');
-        $supervisorNik = (string) $this->request->getPost('nik_pengawas');
-        if ($plannerNik === $supervisorNik) {
-            return redirect()->back()->withInput()->with('error', 'NIK perencana dan pengawas harus berbeda.');
-        }
-
+        if (!$this->validate($rules)) return redirect()->back()->withInput()->with('error', implode(' ', $this->validator->getErrors()));
         $db = Database::connect();
-        if ($db->table('sekolah')->where('npsn', $this->request->getPost('npsn'))->countAllResults() > 0) {
-            return redirect()->back()->withInput()->with('error', 'NPSN tersebut sudah terdaftar.');
-        }
-
-        $plannerEmail = trim((string) $this->request->getPost('email_perencana'))
-            ?: $plannerNik . '.perencana@revit-smp.local';
-        $supervisorEmail = trim((string) $this->request->getPost('email_pengawas'))
-            ?: $supervisorNik . '.pengawas@revit-smp.local';
-
-        foreach ([[$plannerNik, $plannerEmail], [$supervisorNik, $supervisorEmail]] as [$nik, $email]) {
-            $duplicate = $db->table('users')
-                ->groupStart()
-                ->where('username', $nik)
-                ->orWhere('email', $email)
-                ->orWhere('nik', $nik)
-                ->groupEnd()
-                ->countAllResults();
-            if ($duplicate > 0) {
-                return redirect()->back()->withInput()->with('error', 'NIK perencana atau pengawas sudah memiliki akun. Gunakan NIK yang belum terdaftar.');
-            }
-        }
-
+        $perencanaId = (int) $this->request->getPost('perencana_id'); $pengawasId = (int) $this->request->getPost('pengawas_id');
+        $perencana = $db->table('users')->where('id', $perencanaId)->where('role', 'perencana')->get()->getRowArray();
+        $pengawas = $db->table('users')->where('id', $pengawasId)->where('role', 'pengawas')->get()->getRowArray();
+        if (!$perencana || !$pengawas) return redirect()->back()->withInput()->with('error', 'Perencana atau pengawas yang dipilih tidak valid.');
+        if ($perencanaId === $pengawasId) return redirect()->back()->withInput()->with('error', 'Perencana dan pengawas harus merupakan akun yang berbeda.');
+        $npsn = trim((string) $this->request->getPost('npsn'));
+        if ($db->table('sekolah')->where('npsn', $npsn)->countAllResults() > 0) return redirect()->back()->withInput()->with('error', 'NPSN tersebut sudah terdaftar.');
         $db->transBegin();
         try {
-            $db->table('users')->insert([
-                'username'     => $plannerNik,
-                'email'        => $plannerEmail,
-                'password'     => password_hash($plannerNik, PASSWORD_DEFAULT),
-                'nama_lengkap' => trim((string) $this->request->getPost('nama_perencana')),
-                'nik'          => $plannerNik,
-                'no_hp'        => trim((string) $this->request->getPost('hp_perencana')) ?: null,
-                'role'         => 'perencana',
-            ]);
-            $plannerId = (int) $db->insertID();
-
-            $db->table('users')->insert([
-                'username'     => $supervisorNik,
-                'email'        => $supervisorEmail,
-                'password'     => password_hash($supervisorNik, PASSWORD_DEFAULT),
-                'nama_lengkap' => trim((string) $this->request->getPost('nama_pengawas')),
-                'nik'          => $supervisorNik,
-                'no_hp'        => trim((string) $this->request->getPost('hp_pengawas')) ?: null,
-                'role'         => 'pengawas',
-            ]);
-            $supervisorId = (int) $db->insertID();
-
             $db->table('sekolah')->insert([
-                'nama_sekolah' => trim((string) $this->request->getPost('nama_sekolah')),
-                'npsn'         => trim((string) $this->request->getPost('npsn')),
-                'provinsi'     => trim((string) $this->request->getPost('provinsi')),
-                'kab_kota'     => trim((string) $this->request->getPost('kab_kota')),
-                'dana_diterima'=> (float) $this->request->getPost('dana_diterima'),
-                'total_minggu' => (int) $this->request->getPost('total_minggu'),
-                'pengawas_id'  => $supervisorId,
+                'nama_sekolah' => trim((string) $this->request->getPost('nama_sekolah')), 'npsn' => $npsn,
+                'provinsi' => trim((string) $this->request->getPost('provinsi')), 'kab_kota' => trim((string) $this->request->getPost('kab_kota')),
+                'dana_diterima' => (float) $this->request->getPost('dana_diterima'), 'total_minggu' => (int) $this->request->getPost('total_minggu'),
+                'perencana_id' => $perencanaId, 'pengawas_id' => $pengawasId,
             ]);
             $schoolId = (int) $db->insertID();
-
             $db->table('personil_sekolah')->insert([
-                'sekolah_id'       => $schoolId,
-                'kepala_sekolah'   => trim((string) $this->request->getPost('kepala_sekolah')) ?: null,
-                'hp_kepala_sekolah'=> trim((string) $this->request->getPost('hp_kepala_sekolah')) ?: null,
-                'perencana'        => trim((string) $this->request->getPost('nama_perencana')),
-                'hp_perencana'     => trim((string) $this->request->getPost('hp_perencana')) ?: null,
-                'pengawas'         => trim((string) $this->request->getPost('nama_pengawas')),
-                'hp_pengawas'      => trim((string) $this->request->getPost('hp_pengawas')) ?: null,
+                'sekolah_id' => $schoolId, 'kepala_sekolah' => trim((string) $this->request->getPost('kepala_sekolah')) ?: null,
+                'hp_kepala_sekolah' => trim((string) $this->request->getPost('hp_kepala_sekolah')) ?: null,
+                'perencana' => $perencana['nama_lengkap'], 'hp_perencana' => $perencana['no_hp'] ?? null,
+                'pengawas' => $pengawas['nama_lengkap'], 'hp_pengawas' => $pengawas['no_hp'] ?? null,
             ]);
-
-            if (!$db->transStatus()) {
-                throw new \RuntimeException('Database menolak salah satu data sekolah atau akun.');
-            }
+            if (!$db->transStatus()) throw new \RuntimeException('Database menolak data sekolah.');
             $db->transCommit();
         } catch (Throwable $exception) {
-            $db->transRollback();
-            log_message('error', 'Gagal menambahkan sekolah beserta akun: ' . $exception->getMessage());
-            return redirect()->back()->withInput()->with('error', 'Sekolah dan akun gagal dibuat. Periksa NIK, email, serta NPSN.');
+            $db->transRollback(); log_message('error', 'Gagal menambahkan sekolah: ' . $exception->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Sekolah gagal dibuat. Periksa data yang dipilih.');
         }
-
-        return redirect()->to('/admin/sekolah')->with(
-            'success',
-            'Sekolah berhasil dibuat. Username dan password awal perencana serta pengawas menggunakan NIK masing-masing.'
-        );
+        return redirect()->to('/admin/sekolah')->with('success', 'Sekolah berhasil dibuat dengan penugasan perencana dan pengawas dari database.');
     }
+
+    public function updatePenugasan(int $schoolId)
+    {
+        if (session()->get('role') !== 'admin') return redirect()->to('/dashboard')->with('error', 'Hanya admin yang dapat mengubah penugasan.');
+        $db = Database::connect(); $perencanaId = (int) $this->request->getPost('perencana_id'); $pengawasId = (int) $this->request->getPost('pengawas_id');
+        if (!$db->table('sekolah')->where('id', $schoolId)->countAllResults()) return redirect()->to('/admin/sekolah')->with('error', 'Sekolah tidak ditemukan.');
+        $perencana = $db->table('users')->where('id', $perencanaId)->where('role', 'perencana')->get()->getRowArray();
+        $pengawas = $db->table('users')->where('id', $pengawasId)->where('role', 'pengawas')->get()->getRowArray();
+        if (!$perencana || !$pengawas) return redirect()->back()->with('error', 'Perencana atau pengawas yang dipilih tidak valid.');
+        if ($perencanaId === $pengawasId) return redirect()->back()->with('error', 'Perencana dan pengawas harus berbeda.');
+        $db->transBegin();
+        try {
+            $db->table('sekolah')->where('id', $schoolId)->update(['perencana_id' => $perencanaId, 'pengawas_id' => $pengawasId]);
+            $db->table('personil_sekolah')->where('sekolah_id', $schoolId)->update([
+                'perencana' => $perencana['nama_lengkap'], 'hp_perencana' => $perencana['no_hp'] ?? null,
+                'pengawas' => $pengawas['nama_lengkap'], 'hp_pengawas' => $pengawas['no_hp'] ?? null,
+            ]);
+            if (!$db->transStatus()) throw new \RuntimeException('Gagal memperbarui penugasan.');
+            $db->transCommit();
+        } catch (Throwable $exception) {
+            $db->transRollback(); log_message('error', 'Gagal memperbarui penugasan sekolah: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'Penugasan gagal diperbarui.');
+        }
+        return redirect()->to('/admin/sekolah/' . $schoolId)->with('success', 'Perencana dan pengawas berhasil diperbarui.');
+    }
+
 }

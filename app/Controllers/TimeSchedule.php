@@ -16,7 +16,7 @@ class TimeSchedule extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Halaman jadwal awal hanya dapat diakses perencana.');
         }
 
-        $schools = (new SekolahModel())->getByPerencana((string) session()->get('nama_lengkap'));
+        $schools = (new SekolahModel())->getByPerencana((int) session()->get('id'));
         if (empty($schools)) {
             return redirect()->to('/dashboard')->with('error', 'Belum ada sekolah yang ditugaskan kepada akun perencana ini.');
         }
@@ -116,7 +116,7 @@ class TimeSchedule extends BaseController
         }
 
         $schoolId = (int) $this->request->getPost('sekolah_id');
-        $schools = (new SekolahModel())->getByPerencana((string) session()->get('nama_lengkap'));
+        $schools = (new SekolahModel())->getByPerencana((int) session()->get('id'));
         $school = null;
         foreach ($schools as $assignedSchool) {
             if ((int) $assignedSchool['id'] === $schoolId) {

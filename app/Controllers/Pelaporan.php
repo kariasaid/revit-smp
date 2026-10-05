@@ -47,9 +47,24 @@ class Pelaporan extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Tidak ada sekolah kelolaan.');
         }
 
-        $sekolahId = $sekolahList[0]['id'];
+        // Sekolah dapat dipilih dari dropdown. Hanya sekolah yang memang
+        // ditugaskan kepada Pengawas yang boleh dipilih.
+        $requestedSekolahId = (int) $this->request->getGet('sekolah_id');
+        $allowedSchoolIds = array_map(static fn (array $item): int => (int) $item['id'], $sekolahList);
+
+        $sekolahId = in_array($requestedSekolahId, $allowedSchoolIds, true)
+            ? $requestedSekolahId
+            : (int) $sekolahList[0]['id'];
+
+        // Ambil data sekolah yang dipilih sehingga seluruh ringkasan dan
+        // dokumen di bawahnya mengikuti sekolah aktif.
         $sekolah = $sekolahModel->find($sekolahId);
         $jenisPelaporan = $jenis === '100' ? '100%' : '50%';
+
+        // Setiap sekolah wajib memiliki daftar dokumen pelaporan.
+        // Sekolah yang ditambahkan setelah instalasi/seed lama bisa belum
+        // mempunyai baris dokumen_pelaporan, sehingga daftar upload akan kosong.
+        $this->ensureDefaultDocuments($dokumenModel, $sekolahId);
         $dokumen = $dokumenModel->getBySekolahJenis($sekolahId, $jenisPelaporan);
         $summary = $progresModel->getSummary($sekolahId);
 
@@ -61,9 +76,63 @@ class Pelaporan extends BaseController
             'summary'         => $summary,
             'jenis_pelaporan' => $jenisPelaporan,
             'sekolahList'     => $sekolahList,
+            'selectedSchoolId' => $sekolahId,
         ];
 
         return view('pelaporan/index', $data);
+    }
+
+
+    /**
+     * Membuat daftar dokumen pelaporan standar untuk sekolah yang belum memilikinya.
+     * Tidak menimpa dokumen/unggahan yang sudah ada.
+     */
+    private function ensureDefaultDocuments(DokumenPelaporanModel $model, int $sekolahId): void
+    {
+        $defaults = [
+            '50%' => [
+                ['Laporan Kemajuan Progres', 'templates/laporan_kemajuan_progres.pdf', 1],
+                ['Rekap Progres 50%', 'templates/rekap_progres_50.pdf', 2],
+                ['Berita Acara Review tahap 2', 'templates/ba_review_tahap2.pdf', 3],
+                ['Dokumentasi 50%', 'templates/dokumentasi_50.pdf', 4],
+                ['RPD 30%', null, 5],
+                ['Rekening Koran', null, 6],
+            ],
+            '100%' => [
+                ['Laporan Akhir Pelaksanaan', 'templates/laporan_akhir.pdf', 1],
+                ['Rekap Progres 100%', 'templates/rekap_progres_100.pdf', 2],
+                ['Berita Acara Serah Terima', 'templates/ba_serah_terima.pdf', 3],
+                ['Dokumentasi 100%', 'templates/dokumentasi_100.pdf', 4],
+                ['RPD 100%', null, 5],
+                ['Rekening Koran Final', null, 6],
+            ],
+        ];
+
+        foreach ($defaults as $jenis => $items) {
+            $existing = $model->where('sekolah_id', $sekolahId)
+                              ->where('jenis_pelaporan', $jenis)
+                              ->findAll();
+            $existingNames = [];
+            foreach ($existing as $row) {
+                $existingNames[(string) $row['nama_dokumen']] = true;
+            }
+
+            foreach ($items as [$nama, $template, $urutan]) {
+                if (isset($existingNames[$nama])) {
+                    continue;
+                }
+
+                $model->insert([
+                    'sekolah_id' => $sekolahId,
+                    'jenis_pelaporan' => $jenis,
+                    'nama_dokumen' => $nama,
+                    'file_template' => $template,
+                    'status_unggah' => 'Belum Unggah',
+                    'status_validasi' => '-',
+                    'urutan' => $urutan,
+                ]);
+            }
+        }
     }
 
     public function unggah()
